@@ -1,4 +1,4 @@
-module DCD.Types exposing (..)
+module PriceChart.Types exposing (..)
 
 import Date
 import Date.Extra
@@ -71,14 +71,6 @@ mergeHistory =
     List.Extra.foldl1 mergeActions
 
 
-{-| Parameters of an option
--}
-type alias Option =
-    { premium : Price
-    , strikePrice : Price
-    }
-
-
 {-| The bounding rect of a DOM element
 -}
 type alias ElementRect =
@@ -86,18 +78,4 @@ type alias ElementRect =
     , right : Float
     , top : Float
     , bottom : Float
-    }
-
-
-{-| The ID of a DOM element
--}
-type alias ElementId =
-    String
-
-
-{-| Association between DOM ID and size
--}
-type alias ElementSizeInfo =
-    { id : ElementId
-    , rect : ElementRect
     }

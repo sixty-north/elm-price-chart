@@ -1,5 +1,17 @@
 module PriceChart exposing (initialModel, Model, Msg, priceChart, subscriptions, update)
 
+{-|
+SVG price chart implementation in Elm.
+
+# Intitial
+@docs initialModel
+
+# Other
+@docs Model, Msg, priceChart, subscriptions, update
+
+TODO: Do this properly
+-}
+
 import Date
 import Date.Extra
 import Draggable
@@ -73,7 +85,8 @@ priceChart model screenRect =
             , xAxis
             ]
 
-
+{-| Subscriptions needed for full price-chart functionality (e.g. draggability).
+ -}
 subscriptions : Model msg -> Sub.Sub msg
 subscriptions model =
     Draggable.subscriptions (DragMsg >> model.outMsg) model.drag
@@ -86,7 +99,8 @@ type alias Position =
 type alias Focus =
     { date : Date.Date, price : Types.Price }
 
-
+{-| Messages used for the price chart implementation.
+ -}
 type Msg
     = OnDragBy Draggable.Delta
     | DragMsg Draggable.Msg
@@ -97,7 +111,8 @@ dragConfig : Draggable.Config Msg
 dragConfig =
     Draggable.basicConfig OnDragBy
 
-
+{-| The model for price charts.
+ -}
 type alias Model msg =
     { prices : Types.PriceHistory -- the prices to render
     , focus : Maybe Focus -- current focus of the reticle
@@ -128,7 +143,8 @@ initialModel outMsg =
     , drag = Draggable.init
     }
 
-
+{-| Update function for the price-chart.
+ -}
 update : Msg -> Model msg -> ( Model msg, Cmd.Cmd msg )
 update msg model =
     case msg of
