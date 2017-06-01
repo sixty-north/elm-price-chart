@@ -171,12 +171,8 @@ update msg model =
                 { model | position = Position (posx + dx) (posy + dy), startDate = newDate } ! []
 
         DragMsg dragMsg ->
-            -- let
-            --    ( mdl, cmd ) =
             Draggable.update dragConfig dragMsg model
 
-        --in
-        --    ( mdl, Cmd.map DragMsg cmd )
         SetFocus focus ->
             { model | focus = Just focus } ! []
 
