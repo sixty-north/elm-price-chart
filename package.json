@@ -1,0 +1,29 @@
+{
+  "name": "elm-price-chart",
+  "version": "1.0.0",
+  "description": "Elm Price Chart",
+  "scripts": {
+    "build": "elm-make src/Main.elm --output=build/app.js",
+    "debug": "cp src/index.html build/ && elm-live src/Main.elm --output=build/app.js --dir=build -- --debug",
+    "live": "cp src/index.html build/ && elm-live src/Main.elm --output=build/app.js --dir=build",
+    "publish-to-gh-pages": "npm run build && cp src/index.html build/ && gh-pages --dist build/",
+    "test": "elm-test",
+    "tdd": "elm-test --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sixty-north/elm-price-chart.git"
+  },
+  "author": "Austin Bingham",
+  "license": "MPL",
+  "bugs": {
+    "url": "https://github.com/sixty-north/elm-price-chart/issues"
+  },
+  "homepage": "https://github.com/sixty-north/elm-price-chart#readme",
+  "devDependencies": {
+    "elm": "^0.18.0",
+    "elm-live": "^2.6.1",
+    "elm-test": "^0.18.2",
+    "gh-pages": "^0.12.0"
+  }
+}
