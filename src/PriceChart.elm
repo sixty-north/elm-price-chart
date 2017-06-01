@@ -1,15 +1,19 @@
 module PriceChart exposing (initialModel, Model, Msg, priceChart, subscriptions, update)
 
-{-|
-SVG price chart implementation in Elm.
+{-| SVG price chart implementation in Elm.
+
 
 # Intitial
+
 @docs initialModel
 
+
 # Other
+
 @docs Model, Msg, priceChart, subscriptions, update
 
 TODO: Do this properly
+
 -}
 
 import Date
@@ -30,7 +34,7 @@ import Visualization.Scale as Scale
 {-| Render a price chart. This returns an SVG element but not entire SVG; you
 need to embed this into an SVG.
 -}
-priceChart : Model msg -> Types.ElementRect -> Svg msg
+priceChart : Model -> Types.ElementRect -> Svg Msg
 priceChart model screenRect =
     let
         ctx =
@@ -39,7 +43,6 @@ priceChart model screenRect =
         xToMsg x y =
             Focus (mouseXToDate ctx x) (mouseYToPrice ctx y)
                 |> SetFocus
-                |> model.outMsg
 
         setFocusDecoder =
             decode xToMsg
@@ -47,7 +50,7 @@ priceChart model screenRect =
                 |> required "clientY" float
 
         attrs =
-            [ Draggable.mouseTrigger "price-chart" (DragMsg >> model.outMsg)
+            [ Draggable.mouseTrigger "price-chart" DragMsg
             , on "mousemove" setFocusDecoder
             , class "price-chart"
             ]
@@ -85,11 +88,12 @@ priceChart model screenRect =
             , xAxis
             ]
 
+
 {-| Subscriptions needed for full price-chart functionality (e.g. draggability).
- -}
-subscriptions : Model msg -> Sub.Sub msg
+-}
+subscriptions : Model -> Sub.Sub Msg
 subscriptions model =
-    Draggable.subscriptions (DragMsg >> model.outMsg) model.drag
+    Draggable.subscriptions DragMsg model.drag
 
 
 type alias Position =
@@ -99,53 +103,52 @@ type alias Position =
 type alias Focus =
     { date : Date.Date, price : Types.Price }
 
+
 {-| Messages used for the price chart implementation.
- -}
+-}
 type Msg
     = OnDragBy Draggable.Delta
-    | DragMsg Draggable.Msg
+    | DragMsg (Draggable.Msg String)
     | SetFocus Focus
 
 
-dragConfig : Draggable.Config Msg
+dragConfig : Draggable.Config String Msg
 dragConfig =
     Draggable.basicConfig OnDragBy
 
+
 {-| The model for price charts.
- -}
-type alias Model msg =
+-}
+type alias Model =
     { prices : Types.PriceHistory -- the prices to render
     , focus : Maybe Focus -- current focus of the reticle
     , startDate : Date.Date -- The "furthest left" date to display
     , interval : Date.Extra.Interval
     , candlestickWidth : Float -- the width of the candlestick body
     , candlestickPadding : Float -- space between candlesticks
-    , outMsg :
-        Msg
-        -> msg -- wrapper for transporting our messages
     , position : Position -- last drag position
-    , drag : Draggable.State -- required state for Draggable support
+    , drag : Draggable.State String -- required state for Draggable support
     }
 
 
 {-| Create a default Model instance.
 -}
-initialModel : (Msg -> msg) -> Model msg
-initialModel outMsg =
+initialModel : Model
+initialModel =
     { prices = []
     , focus = Nothing
     , startDate = Date.fromTime 0
     , interval = Date.Extra.Day
     , candlestickWidth = 5
     , candlestickPadding = 1
-    , outMsg = outMsg
     , position = Position 0.0 0.0
     , drag = Draggable.init
     }
 
+
 {-| Update function for the price-chart.
- -}
-update : Msg -> Model msg -> ( Model msg, Cmd.Cmd msg )
+-}
+update : Msg -> Model -> ( Model, Cmd.Cmd Msg )
 update msg model =
     case msg of
         OnDragBy ( dx, dy ) ->
@@ -168,12 +171,12 @@ update msg model =
                 { model | position = Position (posx + dx) (posy + dy), startDate = newDate } ! []
 
         DragMsg dragMsg ->
-            let
-                ( mdl, cmd ) =
-                    Draggable.update dragConfig dragMsg model
-            in
-                ( mdl, Cmd.map model.outMsg cmd )
+            -- let
+            --    ( mdl, cmd ) =
+            Draggable.update dragConfig dragMsg model
 
+        --in
+        --    ( mdl, Cmd.map DragMsg cmd )
         SetFocus focus ->
             { model | focus = Just focus } ! []
 
@@ -191,7 +194,7 @@ type alias Context =
 
 {-| Create a rendering context from the current model and window extents.
 -}
-context : Model msg -> Types.ElementRect -> Context
+context : Model -> Types.ElementRect -> Context
 context model screenRect =
     let
         minPrice =
@@ -265,7 +268,7 @@ rect x y width height =
 
 {-| Render a single candlestick.
 -}
-candlestick : Model msg -> Context -> Types.PriceAction -> Svg msg
+candlestick : Model -> Context -> Types.PriceAction -> Svg msg
 candlestick model ctx action =
     let
         xmid =
@@ -312,7 +315,7 @@ candlestick model ctx action =
 
 {-| Draw a reticle at the current date/price coordinate.
 -}
-reticle : Model msg -> Context -> Svg msg
+reticle : Model -> Context -> Svg msg
 reticle model ctx =
     let
         makeReticle focus =

@@ -16,6 +16,10 @@ You can install `PriceChart` using `elm-package`:
 elm-package install --yes sixty-north/elm-price-chart
 ```
 
+## Examples
+
+See [the "examples" directory](examples) for examples of how to use `PriceChart`.
+
 ## Usage
 
 `PriceChart` is a bit of a "component" in the sense that it has its own
@@ -23,8 +27,8 @@ messages, update function, model, and subscriptions. To use it you need to do a
 few things:
 
 1. Include a `PriceChart.Model` in your model.
-2. Provide an "out message" type wraps `PriceChart.Msg`.
-3. When your update sees this "out message", you must call `PriceChart.update`
+2. Provide a message constructor wraps `PriceChart.Msg`.
+3. When your update sees this wrapepr message, you must call `PriceChart.update`
    with the wrapped message and your `PriceChart` model.
 4. Subscribe to `PriceChart.subscriptions`.
 5. Tell `PriceChart` the extents of the DOM element in which it is rendering.
@@ -41,7 +45,7 @@ import PriceChart
 type Msg
     = MyMsg
     | SomeOtherMsg Int
-    | PriceChartOutMsg PriceChart.Msg
+    | PriceChartMsg PriceChart.Msg
 ```
 
 ### Adding `PriceChart.Model` to your model
@@ -54,11 +58,9 @@ import PriceChart
 type alias Model =
     { myData : Int
     . . .
-    , priceChart : PriceChart.Model Msg.Msg
+    , priceChart : PriceChart.Model
     }
 ```
-
-Note that `PriceChart.Model` is parameterized on your message type.
 
 You can get an initial `PriceChart.Model` from `PriceChart.initialModel`:
 
@@ -68,7 +70,7 @@ import PriceChart
 initialModel =
     { myData = 42
     . . .
-    priceChart = PriceChart.initialModel PriceChartOutMsg
+    priceChart = PriceChart.initialModel
     }
 ```
 
@@ -84,11 +86,11 @@ import PriceChart
 update msg model =
     case msg of
         . . .
-        PriceChartOutMsg pcMsg ->
+        PriceChartMsg pcMsg ->
             let
                 (mdl, cmd) = PriceChart.update pcMsg model.priceChart
             in
-                {model | priceChart = mdl} ! [cmd]
+                {model | priceChart = mdl} ! [Cmd.map PriceChartMsg msg]
 ```
 
 ### Put some price information into your `PriceChart.Model`
@@ -143,7 +145,7 @@ main =
         { init = initialModel
         , view = view
         , update = update
-        , subscriptions = \m -> PriceChart.subscriptions m.priceChart
+        , subscriptions = .priceChart >> PriceChart.subscriptions >> Sub.map PriceChartMsg
         }
 ```
 
