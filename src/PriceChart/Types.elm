@@ -1,5 +1,24 @@
 module PriceChart.Types exposing (..)
 
+{-| Types used in the price chart.
+
+
+# Prices and actions
+
+@docs Price, PriceAction, PriceHistory
+
+
+# Price and action utilities
+
+@docs minPrice, maxPrice, actionsByDate, mergeActions, mergeHistory
+
+
+# Rendering
+
+@docs ElementRect
+
+-}
+
 import Date
 import Date.Extra
 import List.Extra
@@ -11,6 +30,8 @@ type alias Price =
     Float
 
 
+{-| The stats for a price's action over some span of time.
+-}
 type alias PriceAction =
     { startDate : Date.Date
     , endDate : Date.Date
@@ -22,11 +43,13 @@ type alias PriceAction =
     }
 
 
+{-| A sequence of price actions, assumed to be in order from most recent to oldest.
+-}
 type alias PriceHistory =
     List PriceAction
 
 
-{-| Get the lowest price in `prices`, or 0.
+{-| Get the lowest price in a history.
 -}
 minPrice : PriceHistory -> Maybe Price
 minPrice =
@@ -34,7 +57,7 @@ minPrice =
         >> List.minimum
 
 
-{-| Get the hightest price in `prices, or 0.`
+{-| Get the hightest price in a history.
 -}
 maxPrice : PriceHistory -> Maybe Price
 maxPrice =
