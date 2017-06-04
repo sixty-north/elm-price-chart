@@ -20,9 +20,9 @@ import Date
 import Date.Extra
 import Draggable
 import Json.Decode exposing (float)
-import Json.Decode.Pipeline exposing (decode, required)
 import List
 import List.Extra exposing (groupWhile)
+import Mouse
 import PriceChart.Types as Types
 import Svg exposing (Svg, rect, path, g, line, text, text_)
 import Svg.Attributes exposing (..)
@@ -40,14 +40,14 @@ priceChart model screenRect =
         ctx =
             context model screenRect
 
-        xToMsg x y =
-            Focus (mouseXToDate ctx x) (mouseYToPrice ctx y)
-                |> SetFocus
+        positionToFocus { x, y } =
+            Focus
+                (mouseXToDate ctx (toFloat x))
+                (mouseYToPrice ctx (toFloat y))
 
         setFocusDecoder =
-            decode xToMsg
-                |> required "clientX" float
-                |> required "clientY" float
+            Mouse.position
+                |> Json.Decode.map (positionToFocus >> SetFocus)
 
         attrs =
             [ Draggable.mouseTrigger "price-chart" DragMsg
@@ -120,14 +120,28 @@ dragConfig =
 {-| The model for price charts.
 -}
 type alias Model =
-    { prices : Types.PriceHistory -- the prices to render
-    , focus : Maybe Focus -- current focus of the reticle
-    , startDate : Date.Date -- The "furthest left" date to display
+    { prices :
+        Types.PriceHistory
+        -- the prices to render
+    , focus :
+        Maybe Focus
+        -- current focus of the reticle
+    , startDate :
+        Date.Date
+        -- The "furthest left" date to display
     , interval : Date.Extra.Interval
-    , candlestickWidth : Float -- the width of the candlestick body
-    , candlestickPadding : Float -- space between candlesticks
-    , position : Position -- last drag position
-    , drag : Draggable.State String -- required state for Draggable support
+    , candlestickWidth :
+        Float
+        -- the width of the candlestick body
+    , candlestickPadding :
+        Float
+        -- space between candlesticks
+    , position :
+        Position
+        -- last drag position
+    , drag :
+        Draggable.State String
+        -- required state for Draggable support
     }
 
 
@@ -181,10 +195,18 @@ update msg model =
 properly rendering the chart.
 -}
 type alias Context =
-    { xScale : Scale.ContinuousTimeScale -- date-to-x scale
-    , yScale : Scale.ContinuousScale -- price-to-y scale
-    , mouseXScale : Scale.ContinuousScale -- absolute screen x-coordinates to viewport scale
-    , mouseYScale : Scale.ContinuousScale -- absolute screen y-coordinates to viewport scale
+    { xScale :
+        Scale.ContinuousTimeScale
+        -- date-to-x scale
+    , yScale :
+        Scale.ContinuousScale
+        -- price-to-y scale
+    , mouseXScale :
+        Scale.ContinuousScale
+        -- absolute screen x-coordinates to viewport scale
+    , mouseYScale :
+        Scale.ContinuousScale
+        -- absolute screen y-coordinates to viewport scale
     }
 
 
