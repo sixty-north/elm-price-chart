@@ -1,0 +1,33 @@
+.price-chart {
+    fill: #000;
+}
+
+.price-chart .reticle {
+    stroke: #aaa;
+    stroke-opacity: 0.3;
+    stroke-width: 1;
+}
+
+.price-chart .price-chart-inc {
+    stroke: #0f0;
+    fill: #0f0;
+}
+
+.price-chart .price-chart-dec {
+    stroke: #f00;
+    fill: #f00;
+}
+
+.price-chart .candlestick {
+    stroke-width: 1;
+    stroke-linejoin: round;
+}
+
+.price-chart .candlestick-body {
+    stroke-width: 0;
+}
+
+.price-chart .tick {
+    stroke: #aaa;
+    fill: #aaa;
+}

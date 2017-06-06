@@ -1,0 +1,31 @@
+<!doctype html>
+<link rel="stylesheet" href="style.css" />
+
+<body>
+    <div id="elm-main"></div>
+    <script src="elm.js"></script>
+    <script>
+        var app = Elm.Basic.embed(document.querySelector("#elm-main"));
+
+        app.ports.requestSize.subscribe(function(id) {
+            var elem = document.getElementById(id);
+            if (!elem) return;
+
+            var crect = elem.getBoundingClientRect();
+            if (!crect) return;
+
+            var rect = {
+                left: crect.left,
+                right: crect.right,
+                top: crect.top,
+                bottom: crect.bottom
+            };
+
+            app.ports.elementSize.send({
+                id: id,
+                rect: rect
+            });
+        });
+
+    </script>
+</body>
